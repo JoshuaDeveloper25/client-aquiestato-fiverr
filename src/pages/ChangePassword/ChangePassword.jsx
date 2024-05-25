@@ -1,13 +1,13 @@
+import { useNavigate, useParams } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { getError } from "../../utils/getError";
-import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Form from "./components/Form";
 import axios from "axios";
 
 const ChangePassword = () => {
   const { tokenid } = useParams();
-  console.log(tokenid);
+  const navigate = useNavigate();
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (userInfo) =>
@@ -16,11 +16,10 @@ const ChangePassword = () => {
         userInfo
       ),
     onSuccess: (res) => {
-      console.log(res);
+      navigate("/sign-in");
     },
     onError: (err) => {
       toast.error(getError(err));
-      console.log(getError(err));
     },
   });
 

@@ -40,7 +40,9 @@ const Navbar = () => {
               </div>
 
               <div className="max-[1030px]:hidden">
-                <Link className="font-bold">Mi cuenta</Link>
+                <Link to={"/sign-in"} className="font-bold">
+                  Mi cuenta
+                </Link>
               </div>
             </div>
 

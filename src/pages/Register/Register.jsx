@@ -1,15 +1,19 @@
 import { useMutation } from "@tanstack/react-query";
 import { getError } from "../../utils/getError";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Form from "./components/Form";
 import axios from "axios";
 
 const Register = () => {
+  const navigate = useNavigate();
+
   const { mutate, isPending } = useMutation({
     mutationFn: async (userInfo) =>
       axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, userInfo),
     onSuccess: (res) => {
       toast.success("¡Registrado exitosamente!");
+      navigate("/sign-in");
       console.log(res);
     },
     onError: (err) => {
