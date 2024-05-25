@@ -1,0 +1,44 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  font-family: "Poppins", sans-serif;
+  scroll-behavior: smooth;
+}
+
+@layer components {
+  .container-page {
+    @apply max-w-[1200px] mx-auto px-2;
+  }
+
+  .animation-fade {
+    @apply duration-300 transition-all ease-in-out;
+  }
+
+  .heading-title {
+    @apply font-[600] text-3xl text-[#31353A];
+  }
+
+  .bootstrap-input {
+    @apply border border-[#eae9e9] rounded outline-0 shadow-[0_0_0_.0rem_rgba(0,0,0,0.4)] px-2 py-2 transition-all duration-300 ease-in-out w-full;
+  }
+
+  .bootstrap-input:focus {
+    @apply border border-primary/50 rounded outline-0 shadow-[0_0_0_.15rem_rgba(0,105,255,.4)] px-2 py-2 w-full;
+  }
+
+  .btn {
+    @apply w-full py-2 px-4 rounded-lg font-medium;
+  }
+
+  .btn-blue {
+    @apply bg-primary text-white;
+  }
+
+  .btn-blue:hover {
+    @apply bg-primary/60;
+  }
+}
