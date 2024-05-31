@@ -20,10 +20,13 @@ import Confirm from "./pages/Confirm/Confirm";
 import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
 import ChangePassword from "./pages/ChangePassword/ChangePassword";
 import ForgotPasswordSuccessMessage from "./pages/ForgotPasswordSuccessMessage/ForgotPasswordSuccessMessage";
+import AdminRoot from "./admin/AdminRoot";
 
 // --> Private and public routes
 import PublicRoutes from "./auth/PublicRoutes";
 import PrivateRoutes from "./auth/PrivateRoutes";
+import AddProduct from "./admin/AddProduct/AddProduct";
+import Home from "./admin/Home/Home";
 
 const router = createBrowserRouter([
   // --> Public Routes
@@ -73,7 +76,22 @@ const router = createBrowserRouter([
     children: [
       {
         element: <Root />,
-        children: [],
+      },
+
+      {
+        element: <AdminRoot />,
+        path: "/admin/",
+        children: [
+          {
+            element: <Home />,
+            index: true,
+          },
+
+          {
+            element: <AddProduct />,
+            path: "/admin/add-product",
+          },
+        ],
       },
     ],
   },

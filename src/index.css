@@ -41,4 +41,18 @@ html {
   .btn-blue:hover {
     @apply bg-primary/60;
   }
+
+  .dashboard-active {
+    @apply bg-primary text-white px-5 py-3 w-full inline-block font-bold;
+  }
+
+  .dashboard-inactive {
+    @apply hover:bg-slate-200 hover:animation-fade px-5 py-3 w-full inline-block font-medium;
+  }
+}
+
+.css-dip3t8 {
+  background: white !important;
+  border-right: 1px solid rgb(231, 231, 231);
+  min-height: 100vh;
 }
