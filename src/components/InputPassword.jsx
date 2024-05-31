@@ -1,13 +1,13 @@
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { useState } from "react";
 
-export const InputPassword = ({ inputEye, inputClassName, inputName }) => {
+export const InputPassword = ({ inputEye, inputClassNameAdd, inputName }) => {
   const [visible, setVisible] = useState(false);
 
   return inputEye ? (
     <div style={{ position: `${inputEye ? "relative" : "static"}` }}>
       <input
-        className={inputClassName || "bootstrap-input"}
+        className={inputClassNameAdd || "bootstrap-input"}
         type={visible ? "text" : "password"}
         name={inputName}
       />

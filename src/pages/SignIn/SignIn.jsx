@@ -19,9 +19,9 @@ const SignIn = () => {
       console.log(res);
 
       // Placing globally the token
-      // axios.defaults.headers.common[
-      //   "Authorization"
-      // ] = `Bearer ${res?.data?.access_token}`;
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${res?.data?.token}`;
     },
     onError: (err) => {
       toast.error(getError(err));

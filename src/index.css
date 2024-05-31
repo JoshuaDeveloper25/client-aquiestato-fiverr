@@ -31,7 +31,7 @@ html {
   }
 
   .btn {
-    @apply w-full py-2 px-4 rounded-lg font-medium;
+    @apply w-full py-2 px-4 rounded-lg font-medium cursor-pointer;
   }
 
   .btn-blue {

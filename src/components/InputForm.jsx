@@ -2,17 +2,19 @@ import { InputPassword } from "./InputPassword";
 
 export const InputForm = ({
   inputPlaceholder,
-  inputClassName,
+  inputClassNameScratch,
+  inputClassNameAdd,
+  labelClassNameAdd,
   inputType,
   inputName,
   inputEye,
 }) => {
   return (
-    <label className={`mb-3 block`}>
+    <label className={`block ${labelClassNameAdd || 'mb-3'}`}>
       <span>{inputPlaceholder}</span>
       {inputEye ? null : (
         <input
-          className={inputClassName || "bootstrap-input"}
+          className={"bootstrap-input" || inputClassNameScratch}
           type={inputType}
           name={inputName}
         />
@@ -20,7 +22,7 @@ export const InputForm = ({
 
       <InputPassword
         inputEye={inputEye}
-        inputClassName={inputClassName}
+        inputClassNameAdd={inputClassNameAdd}
         inputName={inputName}
       />
     </label>
