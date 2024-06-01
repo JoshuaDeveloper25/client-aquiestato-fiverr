@@ -11,11 +11,12 @@ const AdminRoot = () => {
   const location = useLocation();
 
   return (
-    <div style={{ display: "flex", height: "100%", minHeight: "400px" }}>
+    <div className="flex h-full min-h-[400px]">
       <Sidebar
         onBackdropClick={() => setToggled(false)}
         toggled={toggled}
         breakPoint="sm"
+        className="flex-1"
       >
         <Menu>
           {/* Icono Flecha */}
@@ -62,8 +63,8 @@ const AdminRoot = () => {
         </Menu>
       </Sidebar>
 
-      <main style={{ display: "flex", padding: 10 }}>
-        <div>
+      <main className="flex-[60%] p-2">
+        <div className="md:block flex flex-col md:flex-row">
           {/* Hamburguer Button */}
           <button
             className="sb-button min-[577px]:hidden"
