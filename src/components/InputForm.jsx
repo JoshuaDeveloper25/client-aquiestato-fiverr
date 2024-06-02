@@ -7,6 +7,7 @@ export const InputForm = ({
   inputClassNameAditional,
   inputClassNameAdd,
   labelClassNameAdd,
+  defaultValue,
   inputType,
   inputName,
   inputEye,
@@ -18,13 +19,17 @@ export const InputForm = ({
       <span>{inputPlaceholder}</span>
       {inputEye ? null : (
         <input
-          className={`bootstrap-input ${inputClassNameAditional}` || inputClassNameScratch}
+          className={
+            `bootstrap-input block ${inputClassNameAditional}` ||
+            inputClassNameScratch
+          }
           type={inputType}
           name={inputName}
           onChange={onChange}
           value={valueEvent}
           space="&nbsp;"
           placeholder={inputPlaceholderBox}
+          defaultValue={defaultValue}
         />
       )}
 

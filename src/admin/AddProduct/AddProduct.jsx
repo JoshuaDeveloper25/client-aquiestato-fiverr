@@ -1,9 +1,9 @@
-import ProductsAddedTable from "./components/ProductsAddedTable";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import ProductsAddedTable from "./components/ProductsAddedTable";
+import FormCreateProduct from "./components/FormCreateProduct";
 import { getError } from "../../utils/getError";
 import Modal from "../../components/Modal";
 import { toast } from "react-toastify";
-import Form from "./components/Form";
 import { useState } from "react";
 import axios from "axios";
 
@@ -40,6 +40,7 @@ const AddProduct = () => {
       stock: formData.get("stock").trim(),
       uploadImages: e?.target?.uploadImages?.files[0],
       description: formData.get("description").trim(),
+      price: formData.get("price").trim(),
     };
 
     if (
@@ -55,6 +56,8 @@ const AddProduct = () => {
       return toast.error(`¡El stock no puede ser menos 0!`);
     } else if (!formSend?.uploadImages) {
       return toast.error(`¡Imagen es requerida!`);
+    } else if (formSend?.price < 0) {
+      return toast.error(`¡El precio no puede ser menos 0!`);
     }
 
     addProductMutation?.mutate(formSend);
@@ -76,7 +79,7 @@ const AddProduct = () => {
         openModal={openModal}
         setSlug={setSlug}
       >
-        <Form
+        <FormCreateProduct
           setSlug={setSlug}
           slug={slug}
           isPending={addProductMutation?.isPending}

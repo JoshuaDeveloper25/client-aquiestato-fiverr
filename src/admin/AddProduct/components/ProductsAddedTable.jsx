@@ -1,11 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { Table } from "../../../components/Table";
 import { getError } from "../../../utils/getError";
+import { Table } from "../../../components/Table";
 import { createPortal } from "react-dom";
 import { toast } from "react-toastify";
 import { useState } from "react";
 import axios from "axios";
+import Modal from "../../../components/Modal";
+import FormEditProduct from "./FormEditProduct";
+import FormEditStock from "./FormEditStock";
+import FormEditImages from "./FormEditImages";
 
 const ProductsAddedTable = () => {
   const { data, isLoading, isError } = useQuery({
@@ -27,6 +31,11 @@ const ProductsAddedTable = () => {
     {
       header: "Descripción",
       accessorKey: "description",
+    },
+
+    {
+      header: "Precio",
+      accessorKey: "price",
     },
 
     {
@@ -59,8 +68,14 @@ const ProductsAddedTable = () => {
 export default ProductsAddedTable;
 
 const ActionsProducts = ({ info }) => {
-  const queryClient = useQueryClient();
+  const [openEditImagesModal, setOpenEditImagesModal] = useState(false);
+  const [openEditStockModal, setOpenEditStockModal] = useState(false);
+  const [openEditModal, setOpenEditModal] = useState(false);
   const [openDropDown, setOpenDropDown] = useState(false);
+  const [addedImages, setAddedImages] = useState([]);
+  const [slug, setSlug] = useState("");
+  const queryClient = useQueryClient();
+  console.log(addedImages);
 
   const deleteProductMutation = useMutation({
     mutationFn: async () =>
@@ -71,7 +86,7 @@ const ActionsProducts = ({ info }) => {
       ),
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
-      toast.success("¡Producto eliminado exitosamentez!");
+      toast.success("¡Producto eliminado exitosamente!");
     },
     onError: (err) => {
       toast.error(getError(err));
@@ -88,9 +103,124 @@ const ActionsProducts = ({ info }) => {
     deleteProductMutation?.mutate();
   };
 
+  const editProductMutation = useMutation({
+    mutationFn: async (productInfo) =>
+      await axios.put(
+        `${import.meta.env.VITE_BASE_URL}/products/edit-product/${
+          info?.row?.original?._id
+        }`,
+        productInfo
+      ),
+    onSuccess: (res) => {
+      toast.success("¡Producto editado exitosamente!");
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      setOpenEditModal(false);
+    },
+    onError: (err) => {
+      toast.error(getError(err));
+    },
+  });
+
+  const handleEditProduct = (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e?.target);
+
+    const formSend = {
+      productName: formData.get("productName").trim(),
+      slug: slug,
+      description: formData.get("description").trim(),
+      price: formData.get("price").trim(),
+    };
+
+    if (
+      [formSend?.productName, formSend?.slug, formSend?.description].includes(
+        ""
+      )
+    ) {
+      return toast.error(`¡Llena los espacios disponibles!`);
+    } else if (formSend?.stock < 0) {
+      return toast.error(`¡El stock no puede ser menos 0!`);
+    } else if (formSend?.price < 0) {
+      return toast.error(`¡El precio no puede ser menos 0!`);
+    }
+
+    editProductMutation?.mutate(formSend);
+  };
+
+  const editStockMutation = useMutation({
+    mutationFn: async (productInfo) =>
+      await axios.patch(
+        `${import.meta.env.VITE_BASE_URL}/products/edit-stock/${
+          info?.row?.original?._id
+        }`,
+        productInfo
+      ),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("¡Stock editado exitosamente!");
+      setOpenEditStockModal(false);
+      console.log(res);
+    },
+    onError: (err) => {
+      toast.error(getError(err));
+      console.log(err);
+    },
+  });
+
+  const handleEditStock = (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e?.target);
+
+    const formSend = {
+      stock: formData.get("stock").trim(),
+    };
+
+    if ([formSend?.stock].includes("")) {
+      return toast.error(`¡Llena los espacios disponibles!`);
+    } else if (formSend?.stock < 0) {
+      return toast.error(`¡El stock no puede ser menos 0!`);
+    }
+
+    editStockMutation?.mutate(formSend);
+  };
+
+  const editImagesMutation = useMutation({
+    mutationFn: async () =>
+      await axios.patch(
+        `${import.meta.env.VITE_BASE_URL}/products/upload-images/${
+          info?.row?.original?._id
+        }`
+      ),
+    onSuccess: (res) => {
+      toast.success("¡Imagen subida exitosamente!");
+      console.log(res);
+    },
+    onError: (err) => {
+      toast.error(getError(err));
+      console.log(err);
+    },
+  });
+
+  const handleEditImages = (e) => {
+    e.preventDefault();
+
+    const formSend = {
+      uploadImages: e?.target?.uploadImages?.files[0],
+    };
+
+    if (!formSend?.uploadImages) {
+      return toast.error(`¡Imagen es requerida!`);
+    }
+
+    return;
+    editImagesMutation?.mutate(formSend);
+  };
+
   return (
     <>
-      <div class="font-[sans-serif] w-max mx-auto">
+      <div className="font-[sans-serif] w-max mx-auto">
         <button
           id="dropdownDividerButton"
           data-dropdown-toggle="dropdownDivider"
@@ -111,19 +241,38 @@ const ActionsProducts = ({ info }) => {
               document.body
             )}
 
-            <ul class="absolute right-24 shadow-lg bg-white py-2 z-[1000]  w-max rounded max-h-96 overflow-auto">
-              <li class="py-2.5 px-5 hover:bg-primary hover:text-white font-semibold animation-fade text-black text-sm cursor-pointer">
+            <ul className="absolute right-24 shadow-lg bg-white py-2 z-[1000]  w-max rounded max-h-96 overflow-auto">
+              <li
+                onClick={() => {
+                  setOpenEditModal(true);
+                  setOpenDropDown(false);
+                  setSlug(info?.row?.original?.slug);
+                }}
+                className="py-2.5 px-5 hover:bg-primary hover:text-white font-semibold animation-fade text-black text-sm cursor-pointer"
+              >
                 Editar
               </li>
-              <li class="py-2.5 px-5 hover:bg-primary hover:text-white font-semibold animation-fade text-black text-sm cursor-pointer">
+              <li
+                onClick={() => {
+                  setOpenEditImagesModal(true);
+                  setOpenDropDown(false);
+                }}
+                className="py-2.5 px-5 hover:bg-primary hover:text-white font-semibold animation-fade text-black text-sm cursor-pointer"
+              >
                 Editar Imágenes
               </li>
-              <li class="py-2.5 px-5 hover:bg-primary hover:text-white font-semibold animation-fade text-black text-sm cursor-pointer">
+              <li
+                onClick={() => {
+                  setOpenEditStockModal(true);
+                  setOpenDropDown(false);
+                }}
+                className="py-2.5 px-5 hover:bg-primary hover:text-white font-semibold animation-fade text-black text-sm cursor-pointer"
+              >
                 Editar Stock
               </li>
               <li
                 onClick={handleDeleteProduct}
-                class="py-2.5 px-5 hover:bg-red-500 hover:text-white font-semibold animation-fade text-black text-sm cursor-pointer"
+                className="py-2.5 px-5 hover:bg-red-500 hover:text-white font-semibold animation-fade text-black text-sm cursor-pointer"
               >
                 Eliminar
               </li>
@@ -131,6 +280,56 @@ const ActionsProducts = ({ info }) => {
           </>
         )}
       </div>
+
+      {/* Edit Product Modal */}
+      {openEditModal && (
+        <Modal
+          handleSubmit={handleEditProduct}
+          titleModal={"Editar Producto"}
+          setOpenModal={setOpenEditModal}
+          openModal={openEditModal}
+        >
+          <FormEditProduct
+            isPending={editProductMutation?.isPending}
+            infoRow={info?.row?.original}
+            setSlug={setSlug}
+            slug={slug}
+          />
+        </Modal>
+      )}
+
+      {/* Edit Images Modal */}
+      {openEditImagesModal && (
+        <Modal
+          handleSubmit={handleEditImages}
+          titleModal={"Editar Imágenes"}
+          setOpenModal={setOpenEditImagesModal}
+          openModal={openEditImagesModal}
+        >
+          <FormEditImages
+            setOpenEditImagesModal={setOpenEditImagesModal}
+            isPending={editImagesMutation?.isPending}
+            setAddedImages={setAddedImages}
+            infoRow={info?.row?.original}
+            addedImages={addedImages}
+          />
+        </Modal>
+      )}
+
+      {/* Edit Stock Modal */}
+      {openEditStockModal && (
+        <Modal
+          handleSubmit={handleEditStock}
+          titleModal={"Editar Stock"}
+          setOpenModal={setOpenEditStockModal}
+          openModal={openEditStockModal}
+        >
+          <FormEditStock
+            isPending={editStockMutation?.isPending}
+            infoRow={info?.row?.original}
+          />
+        </Modal>
+      )}
     </>
   );
 };
