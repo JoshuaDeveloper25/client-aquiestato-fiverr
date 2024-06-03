@@ -1,8 +1,10 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getError } from "../../../utils/getError";
 import { MdClose } from "react-icons/md";
+import { useEffect, useRef, useState } from "react";
 import { MdEdit } from "react-icons/md";
 import { toast } from "react-toastify";
+import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 
 const FormEditImages = ({
@@ -12,6 +14,10 @@ const FormEditImages = ({
   addedImages,
   setAddedImages,
 }) => {
+  const [editSingleImage, setEditSingleImage] = useState({});
+  const queryClient = useQueryClient();
+  const inputFile = useRef(null);
+
   const deleteSingleImageMutation = useMutation({
     mutationFn: async (imageInfo) =>
       await axios.delete(
@@ -24,6 +30,7 @@ const FormEditImages = ({
       ),
     onSuccess: (res) => {
       toast.success("¡Imagen eliminada exitosamente!");
+      queryClient.invalidateQueries({ queryKey: ["products"] });
       setOpenEditImagesModal(false);
       console.log(res);
     },
@@ -42,12 +49,43 @@ const FormEditImages = ({
     deleteSingleImageMutation?.mutate({ imageId: cloudinary_id });
   };
 
+  const handleDeleteUploadedImage = (id) => {
+    const user_request = confirm(`¿Deseas quitar esta imagen?`);
+
+    if (!user_request) return;
+
+    const uploadedImagesAvailable = addedImages?.filter(
+      (item) => item.id !== id
+    );
+
+    setAddedImages(uploadedImagesAvailable);
+  };
+
+  // --> Upload a file (jpg, jpeg, png)
   const handleUploadFile = (e) => {
-    console.log(e.target.files);
-    setAddedImages([
-      ...addedImages,
-      { url: URL.createObjectURL(e?.target?.files[0]) },
-    ]);
+    const uploadedImages = {
+      url: URL.createObjectURL(e?.target?.files[0]),
+      id: uuidv4(),
+    };
+
+    setAddedImages([...addedImages, uploadedImages]);
+  };
+
+  // --> Functionality to open upload files once the edit button is pressed
+  const handleEditUploadFile = (id, url) => {
+    inputFile?.current?.click();
+  };
+
+  // --> This is once the user has submitted the image
+  const handleEditPenImage = (e, editSingleImageObject) => {
+    setEditSingleImage(editSingleImageObject);
+
+    const uploadedImages = {
+      url: URL.createObjectURL(inputFile.current?.files[0]),
+      id: uuidv4(),
+    };
+
+    setAddedImages([...addedImages, uploadedImages]);
   };
 
   return (
@@ -88,23 +126,39 @@ const FormEditImages = ({
         </div>
       </div>
 
-      <div className="space-x-3 overflow-x-auto py-2 whitespace-nowrap gap-4 my-4">
-        {addedImages?.images?.map((item) => {
-          console.log(item);
+      <div
+        className="space-x-3 overflow-x-auto py-2 whitespace-nowrap gap-4"
+        style={{
+          margin: `${addedImages?.length !== 0 ? "1.5rem  0 0 0" : "0"}`,
+        }}
+      >
+        {addedImages?.map((item) => {
           return (
-            <div className="relative inline-block" key={item?.url}>
+            <div className="relative inline-block" key={item?.id}>
               <img className="h-28 w-28" src={item?.url} />
-              <MdEdit
-                onClick={() => handleDeleteSingleImage(item?.url)}
-                className="size-7 p-[.4rem] hover:text-blue-500 animation-fade hover:bg-white text-white rounded-full absolute cursor-pointer -top-2 right-6 bg-blue-500"
-              />
-              <MdClose
-                onClick={() => handleDeleteSingleImage(item?.url)}
-                className="size-7 p-[.4rem] hover:text-red-500 animation-fade hover:bg-white text-white rounded-full absolute cursor-pointer -top-2 -right-2 bg-red-500"
-              />
+              <button
+                type="button"
+                onClick={() => handleEditUploadFile(item?.id)}
+              >
+                <input
+                  ref={inputFile}
+                  type="file"
+                  id="file"
+                  style={{ display: "none" }}
+                  onInput={(e) => handleEditPenImage(e, item)}
+                />
+                <MdEdit className="size-7 p-[.4rem] hover:text-blue-500 animation-fade hover:bg-white text-white rounded-full absolute cursor-pointer -top-2 right-6 bg-blue-500" />
+              </button>
+              <button type="button">
+                {" "}
+                <MdClose
+                  onClick={() => handleDeleteUploadedImage(item?.id, item?.url)}
+                  className="size-7 p-[.4rem] hover:text-red-500 animation-fade hover:bg-white text-white rounded-full absolute cursor-pointer -top-2 -right-2 bg-red-500"
+                />
+              </button>
             </div>
           );
-        })}
+        }) || []}
       </div>
 
       <button type="submit" className="btn btn-blue" disabled={isPending}>

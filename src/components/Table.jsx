@@ -31,7 +31,7 @@ export const Table = ({ columns = [], data = [] }) => {
 
   return (
     <div className="mt-6">
-      <div className="overflow-x-auto min-w-full max-w-[10rem]">
+      <div className="overflow-x-auto min-w-full max-w-[20rem]">
         {/* --> Input search */}
         {data?.length !== 0 && (
           <>

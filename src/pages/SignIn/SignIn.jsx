@@ -13,7 +13,7 @@ const SignIn = () => {
     mutationFn: async (userInfo) =>
       axios.post(`${import.meta.env.VITE_BASE_URL}/users/login`, userInfo),
     onSuccess: (res) => {
-      toast.success("¡Ingresado exitosamente!");
+      toast.success("¡Ingresado exitosamente!"); 
       localStorage.setItem("userInfo", JSON.stringify(res.data));
       setUserInfo(res.data);
       console.log(res);
@@ -25,6 +25,7 @@ const SignIn = () => {
     },
     onError: (err) => {
       toast.error(getError(err));
+      console.log(err)
     },
   });
 

@@ -2,14 +2,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { getError } from "../../../utils/getError";
 import { Table } from "../../../components/Table";
+import FormEditProduct from "./FormEditProduct";
+import Modal from "../../../components/Modal";
+import FormEditImages from "./FormEditImages";
+import FormEditStock from "./FormEditStock";
 import { createPortal } from "react-dom";
 import { toast } from "react-toastify";
 import { useState } from "react";
 import axios from "axios";
-import Modal from "../../../components/Modal";
-import FormEditProduct from "./FormEditProduct";
-import FormEditStock from "./FormEditStock";
-import FormEditImages from "./FormEditImages";
 
 const ProductsAddedTable = () => {
   const { data, isLoading, isError } = useQuery({
@@ -187,14 +187,17 @@ const ActionsProducts = ({ info }) => {
   };
 
   const editImagesMutation = useMutation({
-    mutationFn: async () =>
+    mutationFn: async (imagesInfo) =>
       await axios.patch(
         `${import.meta.env.VITE_BASE_URL}/products/upload-images/${
           info?.row?.original?._id
-        }`
+        }`,
+        {
+          params: imagesInfo,
+        }
       ),
     onSuccess: (res) => {
-      toast.success("¡Imagen subida exitosamente!");
+      toast.success("¡Acción exitosamente realizada!");
       console.log(res);
     },
     onError: (err) => {
@@ -214,8 +217,7 @@ const ActionsProducts = ({ info }) => {
       return toast.error(`¡Imagen es requerida!`);
     }
 
-    return;
-    editImagesMutation?.mutate(formSend);
+    editImagesMutation?.mutate(addedImages);
   };
 
   return (
