@@ -15,6 +15,7 @@ const FormEditImages = ({
   setAddedImages,
 }) => {
   const [editSingleImage, setEditSingleImage] = useState({});
+  const [prueba, setPrueba] = useState({});
   const queryClient = useQueryClient();
   const inputFile = useRef(null);
 
@@ -61,7 +62,7 @@ const FormEditImages = ({
     setAddedImages(uploadedImagesAvailable);
   };
 
-  // --> Upload a file (jpg, jpeg, png)
+  // --> ✅ Upload a file (jpg, jpeg, png)
   const handleUploadFile = (e) => {
     const uploadedImages = {
       url: URL.createObjectURL(e?.target?.files[0]),
@@ -71,21 +72,31 @@ const FormEditImages = ({
     setAddedImages([...addedImages, uploadedImages]);
   };
 
-  // --> Functionality to open upload files once the edit button is pressed
+  // --> ✅ Functionality to open upload files once the edit button is pressed
   const handleEditUploadFile = (id, url) => {
     inputFile?.current?.click();
   };
 
   // --> This is once the user has submitted the image
   const handleEditPenImage = (e, editSingleImageObject) => {
+    console.log("Entramos");
     setEditSingleImage(editSingleImageObject);
+    const itemId = 1;
 
     const uploadedImages = {
       url: URL.createObjectURL(inputFile.current?.files[0]),
-      id: uuidv4(),
+      id: editSingleImageObject,
     };
 
-    setAddedImages([...addedImages, uploadedImages]);
+    setPrueba((prevState) => {
+      const index = prevState.findIndex(({ id }) => (id = itemId));
+      const item = prevState[index];
+      return [
+        ...prevState.slice(0, index),
+        { ...item, messages: [...item.messages, ...addedImages] },
+        ...prevState.slice(index + 1),
+      ];
+    });
   };
 
   return (
@@ -134,7 +145,7 @@ const FormEditImages = ({
       >
         {addedImages?.map((item) => {
           return (
-            <div className="relative inline-block" key={item?.id}>
+            <div className="relative inline-block" key={uuidv4()}>
               <img className="h-28 w-28" src={item?.url} />
               <button
                 type="button"
